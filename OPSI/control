@@ -1,6 +1,7 @@
 [Package]
 version: 1
 depends: 
+incremental: False
 
 [Product]
 type: localboot
@@ -8,6 +9,7 @@ id: ica-join-domain
 name: ica-join-domain
 description: Add or remove a computer from a Windows Active Directory Domain
 advice: Use setup to add. Use uninstall to remove.
+
 version: 1.0
 priority: 0
 licenseRequired: False
@@ -36,7 +38,7 @@ multivalue: False
 editable: True
 description: Password for the domain admin account
 values: [""]
-default: []
+default: [""]
 
 [ProductProperty]
 type: unicode
@@ -45,7 +47,7 @@ multivalue: False
 editable: True
 description: Domain account with authority to add or remove computers from the domain
 values: [""]
-default: []
+default: [""]
 
 [ProductProperty]
 type: unicode
@@ -54,7 +56,7 @@ multivalue: False
 editable: True
 description: New domain or workspace to join
 values: [""]
-default: []
+default: [""]
 
 [Changelog]
 ica-join-domain (1.0-1) stable; urgency=low
