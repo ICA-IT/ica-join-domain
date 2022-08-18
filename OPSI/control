@@ -1,0 +1,64 @@
+[Package]
+version: 1
+depends: 
+
+[Product]
+type: localboot
+id: ica-join-domain
+name: ica-join-domain
+description: Add or remove a computer from a Windows Active Directory Domain
+advice: Use setup to add. Use uninstall to remove.
+version: 1.0
+priority: 0
+licenseRequired: False
+productClasses: 
+setupScript: setup.ins
+uninstallScript: uninstall.ins
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[ProductProperty]
+type: unicode
+name: machineobjectou
+multivalue: False
+editable: True
+description: Organizational unit to put the new machine in (setup only). Leave blank to put the machine in the default ou (computers).
+values: [""]
+default: [""]
+
+[ProductProperty]
+type: unicode
+name: joinadminpw
+multivalue: False
+editable: True
+description: Password for the domain admin account
+values: [""]
+default: []
+
+[ProductProperty]
+type: unicode
+name: joinadmin
+multivalue: False
+editable: True
+description: Domain account with authority to add or remove computers from the domain
+values: [""]
+default: []
+
+[ProductProperty]
+type: unicode
+name: domainname
+multivalue: False
+editable: True
+description: New domain or workspace to join
+values: [""]
+default: []
+
+[Changelog]
+ica-join-domain (1.0-1) stable; urgency=low
+
+Project created with opsi Package Builder 8.2.2
+
+ -- Package Maintainer <maintainer@server.local.net>  Wed, 17 Aug 2022 18:55:25 +0000

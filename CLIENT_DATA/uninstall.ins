@@ -1,0 +1,91 @@
+; ----------------------------------------------------------------
+; Copyright (c) Island Christian Academy (2022)
+; This sourcecode is based on code writen by Mario Fetka
+; Modified by John Kuras 2022
+; ----------------------------------------------------------------
+
+;****************************************
+; SETUPTYPE      powershell script
+;****************************************
+; PRODUCTID      ica-join-domain
+; SETUPFILE      none
+;****************************************
+; LICENSE        false
+; PRODUCTDESC    Join computer to the domain
+; PRODUCTNAME    Join Domain
+; PRODUCTSIZE    21 MB
+; PRODUCTVER     1.0.0
+;****************************************
+; SETUPSCRIPT    setup.ins
+; UNINSSCRIPT    uninstall.ins
+;****************************************
+   
+[INITIAL]
+;Message = "Rechner wird zur DomÃ¤ne hinzugefÃ¼gt!"
+Message = "Remove computer from the domain!"
+
+[Actions]
+requiredWinstVersion >= "4.11.4.3"
+ScriptErrorMessages = false
+
+DefVar $dom$
+DefVar $user$
+DefVar $password$
+DefVar $ProductId$
+DefVar $Setupfile$
+DefVar $InstallDir$
+DefVar $MinimumSpace$
+DefVar $MsiId$
+DefVar $LicensePool$
+DefVar $ProductName2$
+
+set $dom$ = GetProductProperty("domainname", " ")
+set $user$ = GetProductProperty("joinadmin", " ")
+set $password$ = GetProductProperty("joinadminpw", " ")
+
+; ----------------------------------------------------------------
+
+; $ProductId$ is the name of the product in opsi, only lower letters, no umlauts, no white spaces, use '-' as a seperator
+Set $ProductId$       = "ica-join-domain"
+; $ProductName2$ is the name of the desktop icon
+Set $ProductName2$       = "Join a domain or Worspace"
+Set $Setupfile$       = " "
+; the path where we find the product after the installation
+Set $InstallDir$      = " "
+Set $LicensePool$     = "p_" + $ProductId$
+Set $MsiId$           = ""
+Set $MinimumSpace$    = "21 MB"
+; ----------------------------------------------------------------
+; ----------------------------------------------------------------
+
+if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
+   LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
+   isFatalError "No Space"
+   ; Stop process and set installation status to failed
+else
+   comment "Show product picture"
+   ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductId$
+
+   Message "Uninstalling " + $ProductId$ + " ..."
+   comment "Start uninstall program"
+
+   PatchTextFile_Create_powershell c:\joinpatched.ps1
+  ShellBatch_unJoinDom
+endif
+;  Add-Computer -domainname DOMAIN -OUPath "OU=OU1,OU=OU2,OU=Domainname,DC=company,DC=com" -cred DOMAIN\AuthorizedUser -passthru –verbose
+;  Remove-Computer -UnjoinDomaincredential Domain01\Admin01 -Force
+
+; ----------------------------------------------------------------
+; install section
+; ----------------------------------------------------------------
+
+[PatchTextFile_Create_powershell]
+AddLine  "$secpasswd = ConvertTo-SecureString '$password$' -AsPlainText -Force"
+AddLine  '$mycreds = New-Object System.Management.Automation.PSCredential ("$user$", $secpasswd)'
+AddLine  'Remove-Computer -UnjoinDomainCredential $mycreds -Force'
+SaveToFile "c:\unjoinpatched.ps1"
+
+[ShellBatch_unJoinDom]
+powershell set-executionpolicy RemoteSigned
+powershell -File c:\unjoinpatched.ps1
+del c:\unjoinpatched.ps1
